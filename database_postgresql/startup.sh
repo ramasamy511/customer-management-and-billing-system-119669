@@ -112,6 +112,21 @@ EOF
 echo "mysql -u ${DB_USER} -p${DB_PASSWORD} -h localhost -P ${DB_PORT} ${DB_NAME}" > db_connection.txt
 echo "Connection command saved to db_connection.txt"
 
+# Initialize database schema (schema.sql)
+if [ -f "schema.sql" ]; then
+    echo "Initializing database schema from schema.sql..."
+    # Using appuser for schema setup for better practice
+    mysql -u "${DB_USER}" -p"${DB_PASSWORD}" -h localhost -P "${DB_PORT}" "${DB_NAME}" < schema.sql
+    if [ $? -eq 0 ]; then
+        echo "Database schema (schema.sql) applied successfully."
+    else
+        echo "Failed to apply database schema!"
+        exit 1
+    fi
+else
+    echo "No schema.sql file found, skipping DB schema initialization."
+fi
+
 # Save environment variables to a file
 cat > db_visualizer/mysql.env << EOF
 export MYSQL_URL="mysql://localhost:${DB_PORT}/${DB_NAME}"
